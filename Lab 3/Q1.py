@@ -93,8 +93,6 @@ setkeys()
 message = input("Enter the message: ")
 coded = encoder(message)
 
-print("Initial message:")
-print(message)
 print("\n\nThe encoded message(encrypted by public key)\n")
 print(''.join(str(p) for p in coded))
 print("\n\nThe decoded message(decrypted by public key)\n")
