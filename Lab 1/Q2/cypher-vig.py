@@ -29,7 +29,7 @@ key1=input("Enter the key message : ")
 encrypted_message=encrypt_data(message1,key1)
 print(f'Encrypted Message (Vigenere) : {encrypted_message}')
 
-message2=input("Enter the message to be encrypted : ")
+message2=input("Enter the message to be decrypted : ")
 key2=input("Enter the key message : ")
 decrypted_message=decrypt_data(message2,key2)
 print(f'Decrypted Message (Vigenere) : {decrypted_message}')
