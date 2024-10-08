@@ -1,46 +1,54 @@
-import random
-from sympy import isprime, mod_inverse
+# Given an ElGamal encryption scheme with a public key (p, g, h) and a private 
+# key x, encrypt the message "Confidential Data". Then decrypt the ciphertext to 
+# retrieve the original message.
+from Crypto.Util.number import getPrime, inverse, bytes_to_long, long_to_bytes  # Import necessary functions for number theory
+from Crypto.Random import random  # Import random for secure random number generation
 
-# Helper function to generate a large prime number (for real applications, use a cryptographic library)
-def generate_large_prime(bits):
-    while True:
-        p = random.getrandbits(bits)
-        if isprime(p):
-            return p
+# Function to generate ElGamal keys
+def generate_keys(bits=2048):
+    # Generate a large prime number p
+    p = getPrime(bits)  
+    # Choose a random generator g in the range [2, p-1]
+    g = random.randint(2, p-1) 
+    # Choose a random private key x in the range [2, p-2]
+    x = random.randint(2, p-2) 
+    # Compute the public key h as g^x mod p
+    h = pow(g, x, p)  
+    return (p, g, h), x  # Return the public key (p, g, h) and private key x
 
-# Generate the public and private keys
-def generate_keys(bits=512):
-    p = generate_large_prime(bits)
-    g = random.randint(2, p - 2)
-    x = random.randint(2, p - 2)
-    h = pow(g, x, p)
-    return (p, g, h), (p, g, x)
+# Function to encrypt a message using the ElGamal encryption scheme
+def elgamal_encrypt(public_key, message):
+    p, g, h = public_key  # Unpack the public key
+    # Choose a random integer k in the range [2, p-2]
+    k = random.randint(2, p-2)  
+    # Compute c1 as g^k mod p
+    c1 = pow(g, k, p)  
+    # Convert the message from bytes to a long integer
+    m = bytes_to_long(message)
+    # Compute c2 as (m * h^k) mod p
+    c2 = (m * pow(h, k, p)) % p  
+    return c1, c2  # Return the ciphertext (c1, c2)
 
-# Encrypt a message
-def encrypt(message, public_key):
-    p, g, h = public_key
-    k = random.randint(2, p - 2)
-    c1 = pow(g, k, p)
-    c2 = (pow(h, k, p) * int.from_bytes(message.encode(), 'big')) % p
-    return (c1, c2)
+# Function to decrypt the ciphertext using the ElGamal decryption scheme
+def elgamal_decrypt(private_key, p, c1, c2):
+    x = private_key  # Use the private key x
+    # Compute the shared secret s as c1^x mod p
+    s = pow(c1, x, p) 
+    # Compute the modular inverse of s
+    s_inv = inverse(s, p) 
+    # Recover the original message m as (c2 * s_inv) mod p
+    m = (c2 * s_inv) % p 
+    return long_to_bytes(m)  # Convert the long integer back to bytes
 
-# Decrypt a message
-def decrypt(ciphertext, private_key):
-    p, g, x = private_key
-    c1, c2 = ciphertext
-    s = pow(c1, x, p)
-    s_inv = mod_inverse(s, p)
-    decrypted_message = (c2 * s_inv) % p
-    return decrypted_message.to_bytes((decrypted_message.bit_length() + 7) // 8, 'big').decode()
+# Generate public and private keys
+public_key, private_key = generate_keys(bits=2048)
+# Define the message to be encrypted
+message = b"Confidential Data"
 
-# Example usage
-public_key, private_key = generate_keys()
-message = input("Enter the message to encrypt: ")#Confidential Data
+# Encrypt the message using the public key
+ciphertext = elgamal_encrypt(public_key, message)
+print("Ciphertext:", ciphertext)  # Display the ciphertext
 
-# Encrypt the message
-ciphertext = encrypt(message, public_key)
-print(f"Ciphertext: {ciphertext}")
-
-# Decrypt the message
-decrypted_message = decrypt(ciphertext, private_key)
-print(f"Decrypted Message: {decrypted_message}")
+# Decrypt the ciphertext using the private key
+decrypted_message = elgamal_decrypt(private_key, public_key[0], ciphertext[0], ciphertext[1])
+print("Decrypted message:", decrypted_message.decode())  # Display the original message after decryption

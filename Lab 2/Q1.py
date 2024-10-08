@@ -1,3 +1,5 @@
+# Encrypt the message "Confidential Data" using DES with the following key: 
+# "A1B2C3D4". Then decrypt the ciphertext to verify the original message.
 from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad, unpad
 

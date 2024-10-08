@@ -1,3 +1,7 @@
+#  Encrypt the message "I am learning information security" using one of the 
+# following ciphers. Ignore the space between words. Decrypt the message to 
+# get the original plaintext:
+# Multiplicative cipher with key = 15
 def encrypt_affine(plaintext, key1, key2):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     plaintext = plaintext.replace(' ', '')

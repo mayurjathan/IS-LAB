@@ -1,99 +1,96 @@
-import random
-import math
+# Using RSA, encrypt the message "Asymmetric Encryption" with the public key 
+# (n, e). Then decrypt the ciphertext with the private key (n, d) to verify the original 
+# message.
 
-prime = set()
-
-public_key = None
-private_key = None
-n = None
-
-def primefiller():
-    seive = [True] * 250
-    seive[0] = False
-    seive[1] = False
-    for i in range(2, 250):
-        for j in range(i * 2, 250, i):
-            seive[j] = False
-
-    for i in range(len(seive)):
-        if seive[i]:
-            prime.add(i)
-
-def pickrandomprime():
-    global prime
-    k = random.randint(0, len(prime) - 1)
-    it = iter(prime)
-    for _ in range(k):
-        next(it)
-
-    ret = next(it)
-    prime.remove(ret)
-    return ret
-
-def setkeys():
-    global public_key, private_key, n
-    prime1 = pickrandomprime()  # First prime number
-    prime2 = pickrandomprime()  # Second prime number
-
-    n = prime1 * prime2
-    fi = (prime1 - 1) * (prime2 - 1)
-
-    e = 2
-    while True:
-        if math.gcd(e, fi) == 1:
-            break
-        e += 1
-
-    public_key = e
-
-    d = 2
-    while True:
-        if (d * e) % fi == 1:
-            break
-        d += 1
-
-    private_key = d
-
-def encrypt(message):
-    global public_key, n
-    e = public_key
-    encrypted_text = 1
-    while e > 0:
-        encrypted_text *= message
-        encrypted_text %= n
-        e -= 1
-    return encrypted_text
-
-def decrypt(encrypted_text):
-    global private_key, n
-    d = private_key
-    decrypted = 1
-    while d > 0:
-        decrypted *= encrypted_text
-        decrypted %= n
-        d -= 1
-    return decrypted
-
-def encoder(message):
-    encoded = []
-    # Calling the encrypting function in encoding function
-    for letter in message:
-        encoded.append(encrypt(ord(letter)))
-    return encoded
-
-def decoder(encoded):
-    s = ''
-    for num in encoded:
-        s += chr(decrypt(num))
-    return s
+# from Crypto.PublicKey import RSA
+# from Crypto.Cipher import PKCS1_OAEP
+# from binascii import hexlify, unhexlify
 
 
-primefiller()
-setkeys()
-message = input("Enter the message: ")
-coded = encoder(message)
+# # Function to generate RSA keys
+# def generate_rsa_keys():
+#     key = RSA.generate(2048)
+#     private_key = key.export_key()
+#     public_key = key.publickey().export_key()
+#     return key, private_key, public_key
 
-print("\n\nThe encoded message(encrypted by public key)\n")
-print(''.join(str(p) for p in coded))
-print("\n\nThe decoded message(decrypted by public key)\n")
-print(''.join(str(p) for p in decoder(coded)))
+
+# # Function to encrypt the message using RSA public key
+# def rsa_encrypt(plain_text, public_key):
+#     rsa_key = RSA.import_key(public_key)
+#     cipher = PKCS1_OAEP.new(rsa_key)
+#     cipher_text = cipher.encrypt(plain_text.encode())
+#     return hexlify(cipher_text).decode()
+
+
+# # Function to decrypt the ciphertext using RSA private key
+# def rsa_decrypt(cipher_text, private_key):
+#     rsa_key = RSA.import_key(private_key)
+#     cipher = PKCS1_OAEP.new(rsa_key)
+#     decrypted_text = cipher.decrypt(unhexlify(cipher_text))
+#     return decrypted_text.decode()
+
+
+# # Generate RSA keys
+# key, private_key, public_key = generate_rsa_keys()
+
+# # Message to encrypt
+# plain_text = "Asymmetric Encryption"
+
+# # Encrypt the message using the public key
+# cipher_text = rsa_encrypt(plain_text, public_key)
+# print(f"Ciphertext: {cipher_text}")
+
+# # Decrypt the ciphertext using the private key
+# decrypted_text = rsa_decrypt(cipher_text, private_key)
+# print(f"Decrypted text: {decrypted_text}")
+
+# # Verify if the original message is recovered
+# assert decrypted_text == plain_text
+
+from Crypto.PublicKey import RSA  # Import RSA key generation from PyCryptodome
+from Crypto.Cipher import PKCS1_OAEP  # Import the PKCS#1 OAEP cipher for RSA
+import binascii  # Import binascii for hexadecimal conversions
+
+# Generate a new RSA key pair with a key size of 2048 bits
+key = RSA.generate(2048)  # Create a new RSA key object
+
+# Extract the components of the key
+n = key.n  # The modulus
+e = key.e  # The public exponent
+d = key.d  # The private exponent
+
+# Get the public key for encryption
+public_key = key.publickey()  # Extract the public key from the key object
+private_key = key  # Store the private key for later decryption
+
+# Print the key components
+print(f"n={n}")  # Print the modulus
+print(f"e={e}")  # Print the public exponent
+print(f"d={d}")  # Print the private exponent
+
+# Message to be encrypted
+message = "Asymmetric Encryption"  # Define the plaintext message to encrypt
+
+# Encrypt the message using the public key
+
+# Initialize the cipher for encryption with the public key
+cipher_encrypt = PKCS1_OAEP.new(public_key) 
+
+# Encrypt the message (convert to bytes)
+ciphertext = cipher_encrypt.encrypt(message.encode())  #.encode() converts the message to bytes
+
+# Print the encrypted message in hexadecimal format
+print("Ciphertext (hex):", binascii.hexlify(ciphertext).decode())  
+
+
+# Decrypt the ciphertext using the private key
+
+# Initialize the cipher for decryption with the private key
+cipher_decrypt = PKCS1_OAEP.new(private_key)  
+
+# Decrypt the ciphertext to get the original message
+decrypted_message = cipher_decrypt.decrypt(ciphertext)  
+
+# Display the decrypted message
+print("Decrypted message:", decrypted_message.decode())  # Print the original message after decryption

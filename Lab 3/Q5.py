@@ -1,63 +1,55 @@
-import time
-import random
-from sympy import isprime, nextprime
+# As part of a project to enhance the security of communication in a peer-to-peer 
+# file sharing system, you are tasked with implementing a secure key exchange 
+# mechanism using the Diffie-Hellman algorithm. Each peer must establish a 
+# shared secret key with another peer over an insecure channel. Implement the 
+# Diffie-Hellman key exchange protocol, enabling peers to generate their public 
+# and private keys and securely compute the shared secret key. Measure the time 
+# taken for key generation and key exchange processes.
 
-# Function to generate a large prime number
-def generate_large_prime(bits=512):
-    p = random.getrandbits(bits)
-    while not isprime(p):
-        p = random.getrandbits(bits)
-    return p
+from Crypto.Random import random  # Import random for generating secure random numbers
+import time  # Import time for measuring performance
 
-# Function to generate a private key
-def generate_private_key(prime):
-    return random.randint(1, prime - 1)
+# Define parameters for the DSA key generation(to create keys fow which we will perform diffie helleman)
+# p is a large prime number
+p = int('0xB10B8F96A080E01DE7B9CBE6B86A2A33'
+        '8C1F3C2E1F00B03A6C1C4A64B92D90C4'
+        'A8323512CD225E1A91D3A26755E59D6E'
+        'F9E4551AEF8765363458D647D148D479'
+        '545AA381C37A35D93F0BFB3EC0C6B47B'
+        '940670BB2D91B24BFFD9841F1E229149'
+        '23B9AFA8E827C9EBC7206CF94CFF2DAE'
+        'A2A14720C071DFDD88D47FCA9F1F4359', 16)  # Hexadecimal to integer conversion
 
-# Function to compute the public key
-def compute_public_key(private_key, base, prime):
-    return pow(base, private_key, prime)
+g = 2  # Base generator for the group (commonly a small integer)
 
-# Function to compute the shared secret key
-def compute_shared_secret(public_key, private_key, prime):
-    return pow(public_key, private_key, prime)
+# Measure the time taken to generate private keys
+start_time = time.time()  # Start timer
+# Generate random private keys for both parties, A and B
+private_key_A = random.StrongRandom().randint(2, p-2)  # Private key A must be in the range [2, p-2]
+private_key_B = random.StrongRandom().randint(2, p-2)  # Private key B must be in the range [2, p-2]
+key_generation_time = time.time() - start_time  # Calculate the time taken for key generation
 
-# Set parameters
-bits = 512  # Size of the prime number
-base = 2    # Common base (generator)
+# Measure the time taken to generate public keys
+start_time = time.time()  # Start timer
+# Compute public keys based on private keys and parameters p and g
+public_key_A = pow(g, private_key_A, p)  # Public key A = g^private_key_A mod p
+public_key_B = pow(g, private_key_B, p)  # Public key B = g^private_key_B mod p
+public_key_generation_time = time.time() - start_time  # Calculate the time taken for public key generation
 
-# Generate a large prime number for the prime modulus
-prime = generate_large_prime(bits)
+# Measure the time taken for key exchange from Peer A's perspective
+start_time = time.time()  # Start timer
+# Calculate the shared secret from Peer A's perspective
+shared_secret_A = pow(public_key_B, private_key_A, p)  # Shared secret A = public_key_B^private_key_A mod p
+key_exchange_time_A = time.time() - start_time  # Calculate the time taken for key exchange for Peer A
 
-# Generate private keys for two peers
-private_key_peer1 = generate_private_key(prime)
-private_key_peer2 = generate_private_key(prime)
+# Measure the time taken for key exchange from Peer B's perspective
+start_time = time.time()  # Start timer
+# Calculate the shared secret from Peer B's perspective
+shared_secret_B = pow(public_key_A, private_key_B, p)  # Shared secret B = public_key_A^private_key_B mod p
+key_exchange_time_B = time.time() - start_time  # Calculate the time taken for key exchange for Peer B
 
-# Compute public keys for two peers
-start_time = time.time()
-public_key_peer1 = compute_public_key(private_key_peer1, base, prime)
-public_key_peer2 = compute_public_key(private_key_peer2, base, prime)
-end_time = time.time()
-print(f"Time taken for public key generation: {end_time - start_time:.5f} seconds")
-
-# Compute shared secrets
-start_time = time.time()
-shared_secret_peer1 = compute_shared_secret(public_key_peer2, private_key_peer1, prime)
-shared_secret_peer2 = compute_shared_secret(public_key_peer1, private_key_peer2, prime)
-end_time = time.time()
-print(f"Time taken for shared secret computation: {end_time - start_time:.5f} seconds")
-
-# Print results
-print(f"Prime: {prime}")
-print(f"Base: {base}")
-print(f"Private Key Peer 1: {private_key_peer1}")
-print(f"Private Key Peer 2: {private_key_peer2}")
-print(f"Public Key Peer 1: {public_key_peer1}")
-print(f"Public Key Peer 2: {public_key_peer2}")
-print(f"Shared Secret (Peer 1): {shared_secret_peer1}")
-print(f"Shared Secret (Peer 2): {shared_secret_peer2}")
-
-# Verify if both computed shared secrets match
-if shared_secret_peer1 == shared_secret_peer2:
-    print("Key exchange successful. Shared secrets match!")
-else:
-    print("Key exchange failed. Shared secrets do not match.")
+# Print the timing results for each operation
+print(f"Key Generation Time: {key_generation_time:.4f} seconds")  # Time taken to generate private keys
+print(f"Public Key Generation Time: {public_key_generation_time:.4f} seconds")  # Time taken to generate public keys
+print(f"Key Exchange Time (Peer A): {key_exchange_time_A:.4f} seconds")  # Time taken for key exchange by Peer A
+print(f"Key Exchange Time (Peer B): {key_exchange_time_B:.4f} seconds")  # Time taken for key exchange by Peer B

@@ -1,3 +1,7 @@
+# Encrypt the message "the house is being sold tonight" using one of the 
+# following ciphers. Ignore the space between words. Decrypt the message to 
+# get the original plaintext:
+# b) Autokey cipher with key = 7
 def encrypt_data(text, key):
     alphabet='abcdefghijklmnopqrstuvwxyz'
     text=text.replace(' ', '')

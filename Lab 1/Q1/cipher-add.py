@@ -1,3 +1,7 @@
+# Encrypt the message "I am learning information security" using one of the 
+#following ciphers. Ignore the space between words. Decrypt the message to 
+#get the original plaintext:
+#a) Additive cipher with key = 20
 def encrypt_additive(plaintext, key):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     plaintext = plaintext.replace(' ', '')  

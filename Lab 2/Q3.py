@@ -1,3 +1,6 @@
+# Compare the encryption and decryption times for DES and AES-256 for the 
+# message "Performance Testing of Encryption Algorithms". Use a standard 
+# implementation and report your findings.
 
 import time
 from Crypto.Cipher import DES, AES

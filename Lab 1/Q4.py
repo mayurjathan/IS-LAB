@@ -1,3 +1,8 @@
+# Use a Hill cipher to encipher the message "We live in an insecure world". Use 
+# the following key:
+# K = [03 03
+# 02 07]
+
 import math
 def get_key_matrix(key):
   size=int(math.sqrt(len(key)))

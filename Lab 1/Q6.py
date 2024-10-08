@@ -1,3 +1,7 @@
+# Use a brute-force attack to decipher the following message. Assume that you 
+# know it is an affine cipher and that the plaintext "ab" is enciphered to "GL":
+# XPALASXYFGFUKPXUSOGEUTKCDGEXANMGNVS
+
 from string import ascii_uppercase
 def mod_inverse(a, m):
     for x in range(1, m):

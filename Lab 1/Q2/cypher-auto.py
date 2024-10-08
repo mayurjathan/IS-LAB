@@ -1,3 +1,7 @@
+# Encrypt the message "the house is being sold tonight" using one of the 
+# following ciphers. Ignore the space between words. Decrypt the message to 
+# get the original plaintext:
+# a) Vigenere cipher with key: "dollars"
 def autokey_encrypt(plaintext, key):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     plaintext = plaintext.replace(' ', '')  # Remove spaces

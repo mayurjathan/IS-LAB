@@ -1,3 +1,9 @@
+# John is reading a mystery book involving cryptography. In one part of the 
+# book, the author gives a ciphertext "CIW" and two paragraphs later the author 
+# tells the reader that this is a shift cipher and the plaintext is "yes". In the next 
+# chapter, the hero found a tablet in a cave with "XVIEWYWI" engraved on it. 
+# John immediately found the actual meaning of the ciphertext. Identify the 
+# type of attack and plaintext.
 # the type of attack is known plain-text attack
 def shift_cipher(text,shift):
   result = ""
